@@ -1,5 +1,6 @@
 import threading
 import time
+import streamlit as st
 
 # Taxi Class to hold taxi details, location, earnings and availability
 class Taxi:
@@ -30,7 +31,10 @@ class TaxiBookingSystem:
         else:
             return 100 + (distance-5)*10
         
-    
+    def taxi_availability(self):
+        status = {taxi.id:("Availabe" if taxi.available else "Busy") for taxi in self.taxis}
+        return status
+        
     def get_nearest_taxi(self, pickup):
         near = None
         min_distance = float('inf')
@@ -45,6 +49,7 @@ class TaxiBookingSystem:
                         min_distance = distance
         # Returning the nearest taxi id
         return near
+    
     def change_status(self, taxi_id):
             taxi = next((i for i in self.taxis if i.id == taxi_id), None)
             if taxi:
@@ -66,30 +71,45 @@ class TaxiBookingSystem:
         print(f"Your Booking has been Successful, Your Taxi ID is {taxi.id}, Your Fare is {fare}\n")
         threading.Timer(15, self.change_status, [taxi.id]).start()
 
-        
-
 booking = TaxiBookingSystem()
 
+print(booking.taxi_availability())
 booking.book_taxi('A', 'D')  # Booking 1
 time.sleep(3)
+
+print(booking.taxi_availability())
 booking.book_taxi('A', 'C')  # Booking 2
 time.sleep(3)
+
 booking.book_taxi('A', 'B')  # Booking 3
+print(booking.taxi_availability())
 time.sleep(3)
+
 booking.book_taxi('B', 'D')  # Booking 4
 print(booking.get_earnings())
+print(booking.taxi_availability())
 time.sleep(3)
+
+print(booking.taxi_availability())
 booking.book_taxi('D', 'E')  # Booking 5 (this may get rejected if no taxis are free)
+print(booking.taxi_availability())
 time.sleep(4)
+
 booking.book_taxi('D', 'E')
+print(booking.taxi_availability())
 time.sleep(10)
 # booking.change_status(1)  # Changing the availability of Taxi id 1 manually
+print(booking.taxi_availability())
 booking.book_taxi('E', 'F')
+print(booking.taxi_availability())
 time.sleep(3)
 # booking.change_status(2)
 # booking.change_status(3) 
+print(booking.taxi_availability())
 booking.book_taxi('B', 'D')
 time.sleep(3)
+
+print(booking.taxi_availability())
 booking.book_taxi('C', 'E')
 print(booking.get_earnings())
 
