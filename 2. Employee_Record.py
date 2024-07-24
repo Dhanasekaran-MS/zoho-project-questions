@@ -27,7 +27,7 @@ class EmployeeManagement:
     def add_employee(self, name, id, age, dep, pos, man_id=None):
         if id in self.employees:
             print(f"Employee ID {id} already exists.")
-        elif man_id and self.check_circular_reference(id):
+        elif man_id and self.check_circular_reference(id, man_id):
             print("Circular reference detected. Cannot add employee.")
         else:
             self.employees[id] = Employee(name, id, age, dep, pos, man_id)
@@ -80,16 +80,19 @@ class EmployeeManagement:
             self.hierarchy(s.Id, level+1)
 
 # - Handle edge cases such as circular references in the reporting structure.
-    def check_circular_reference(self,emp_id):
+    def check_circular_reference(self, emp, manager):
         visited = set()
-        current = emp_id
+        current = manager
         while current:
             if current in visited:
                 return True
             visited.add(current)
-            current = self.employees.get(current)
-            if current:
-                current = current.Manager
+
+            if current == emp:
+                return True  # Circular reference detected
+            
+            if current in self.employees:
+                current = self.employees[current].Manager
             else:
                 break
         return False
